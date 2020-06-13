@@ -63,18 +63,10 @@ app.post('/submit-form', (req, res) => {
 
   for (const event of Object.values(events)) {
       if(event.start && event.end){
-        var stdate = new Date(Date.UTC(event.start.getFullYear(),
-                              event.start.getMonth(),
-                              event.start.getDate(),
-                              event.start.getHours(),
-                              event.start.getMinutes() + event.start.getTimezoneOffset()
-        ));
-        var endate = new Date(Date.UTC(event.end.getFullYear(),
-                              event.end.getMonth(),
-                              event.end.getDate(),
-                              event.end.getHours(),
-                              event.end.getMinutes() + event.end.getTimezoneOffset()
-                              ));                              
+        var stdate = new Date(event.start);
+        var endate = new Date(event.end);
+        event.start.setHours(stdate.getHours(),stdate.getMinutes() + event.start.getTimezoneOffset() );
+        event.end.setHours(endate.getHours(),endate.getMinutes() + event.start.getTimezoneOffset() );
         event.start.setUTCDate(stdate.getUTCDate() + Math.abs(Difference_In_Days));
         event.end.setUTCDate(endate.getUTCDate() + Math.abs(Difference_In_Days));
       }
@@ -102,6 +94,7 @@ app.post('/submit-form', (req, res) => {
 
   const cal  = ical_w(no_event)
   cal.events(event_list)
+  console.log(event_list[0])
 
   for(i = 0; i < repeat_event_list.length; i++){
     //repeat_event_list[i].rrule.options.dtstart = repeat_event_list[i].start
