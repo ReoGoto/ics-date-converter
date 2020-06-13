@@ -55,7 +55,8 @@ app.post('/submit-form', (req, res) => {
 
   console.log(minimumDate)
   minimumDate.setUTCHours( minimumDate.getUTCHours(), minimumDate.getUTCMinutes()  )
-  console.log( "minday " + minimumDate.toISOString())
+  //minimumDate = minimumDate.toISOString()
+  console.log( "minday " + minimumDate)
 
 
   console.log(start_date.getDate() - minimumDate.getDate())
@@ -75,10 +76,13 @@ app.post('/submit-form', (req, res) => {
 
         var stdate = new Date(event.start);
         var endate = new Date(event.end);
-        event.start.setUTCHours(stdate.getUTCHours(), stdate.getUTCMinutes() + diff );
-        event.end.setUTCHours(endate.getUTCHours(), endate.getUTCMinutes() + diff );
+        event.start.setUTCHours(stdate.getUTCHours(), stdate.getUTCMinutes()  );
+        event.end.setUTCHours(endate.getUTCHours(), endate.getUTCMinutes()  );
         event.start.setUTCDate(stdate.getUTCDate() + Math.abs(Difference_In_Days));
         event.end.setUTCDate(endate.getUTCDate() + Math.abs(Difference_In_Days));        
+
+        event.start = event.start.toISOString()
+        event.end = event.end.toISOString()
 
         console.log("new " + event.start)
         console.log("==========================")
