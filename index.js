@@ -5,7 +5,8 @@ const fileUpload = require('express-fileupload')
 const ical = require('node-ical');
 //const ics = require('ics')
 const ical_w = require('ical-generator');
-const { Console } = require('console');
+var moment = require('moment-timezone');
+const { start } = require('repl');
 
 const app = express()
 app.use(fileUpload());
@@ -21,19 +22,29 @@ app.post('/submit-form', (req, res) => {
   var filename = req.files.document.name
   //console.log( req.files.document.name); // the uploaded file object
   var start_date = new Date(req.body.startDate)
-  console.log( "input " + start_date )
-  start_date.setHours(start_date.getHours(),start_date.getMinutes() + start_date.getTimezoneOffset() );
-  console.log( "input " + start_date )
+  console.log( "input " + start_date.toISOString() )
+
+  var diff = start_date.getTimezoneOffset()
+  console.log("diff " + diff )
+
+  //moment().tz("America/Los_Angeles").format();
+  start_date.setHours(start_date.getHours(),start_date.getMinutes() + 0*start_date.getTimezoneOffset() );
+
+  //  start_date.toISOString()  //=> "2020-04-12T16:00:00.000Z"
+  console.log("now " +   start_date.toISOString()    )
+  //console.log("now   " + start_date )
 
   //const events = ical.sync.parseFile('JusticeJune.ics');
   const events = ical.sync.parseICS(req.files.document.data.toString() );
-  
+
   var dates = []; 
   for (const event of Object.values(events)) {
       if(event.start)
         dates.push(new Date(event.start )); 
   };
   var minimumDate = dates[0]
+  console.log( typeof(minimumDate))
+//  minimumDate.setHours(minimumDate.getHours(),minimumDate.getMinutes() - diff )
 
   for(i = 1; i<dates.length; i++){
     if(minimumDate.getTime() > dates[i].getTime()){
@@ -42,38 +53,40 @@ app.post('/submit-form', (req, res) => {
     }
   }
 
-  //var minimumDate = new Date(Math.min.apply(null, dates)); 
-  //start_date.setUTCHours(minimumDate.getUTCHours())
-  
-  //start_date.setHours(minimumDate.getHours())
+  console.log(minimumDate)
+  minimumDate.setUTCHours( minimumDate.getUTCHours()-5, minimumDate.getUTCMinutes()  )
+  console.log( "minday " + minimumDate.toISOString())
+
+
   console.log(start_date.getDate() - minimumDate.getDate())
-  
+  console.log("stday " + start_date.getDate() + " minday " + minimumDate.getDate())
   // var Difference_In_Time = start_date.getTime() - minimumDate.getTime(); 
   // var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24); 
   var s = new Date(start_date)
   var m = new Date(minimumDate)
-  s.setHours(0,0,0)
-  m.setHours(0,0,0)
+  s.setUTCHours(0,0,0)
+  m.setUTCHours(0,0,0)
   var Difference_In_Days = s.getDate() - m.getDate()
-  //console.log("s " + s)
-  //console.log("m " + m)
-
+  
 
   for (const event of Object.values(events)) {
       if(event.start && event.end){
+        //console.log("old" + event.start)
+
         var stdate = new Date(event.start);
         var endate = new Date(event.end);
-        //event.start.setHours(stdate.getHours(),stdate.getMinutes() + event.start.getTimezoneOffset() );
-        //event.end.setHours(endate.getHours(),endate.getMinutes() + event.start.getTimezoneOffset() );
-        event.start.setUTCDate(stdate.getUTCDate() + Math.abs(Difference_In_Days));
-        event.end.setUTCDate(endate.getUTCDate() + Math.abs(Difference_In_Days));        
+        event.start.setUTCHours(stdate.getUTCHours()-5, stdate.getUTCMinutes()  );
+        event.end.setUTCHours(endate.getUTCHours()-5, endate.getUTCMinutes()  );
+        event.start.setDate(stdate.getDate() + Math.abs(Difference_In_Days));
+        event.end.setDate(endate.getDate() + Math.abs(Difference_In_Days));        
+
+        //console.log("new " + event.start.toISOString())
+        //console.log("==========================")
       }
       if(event.rrule)
         console.log("rrule " + event.rrule)
-
-      // var v = new Date(2020,2,2,2,2+start_date.getTimezoneOffset())
-      // console.log("values " + v)
       
+     // console.log(event.start.toISOString() )
   };
   
   var event_list = [];
@@ -96,9 +109,7 @@ app.post('/submit-form', (req, res) => {
 
   for(i = 0; i < repeat_event_list.length; i++){
     //repeat_event_list[i].rrule.options.dtstart = repeat_event_list[i].start
-    //repeat_event_list[i].rrule.options.byweekday = [ 4 ]
     var freq = repeat_event_list[i].rrule.options.freq
-    //console.log("freq " + freq)
     if( freq == 1 ) 
       freq = "DAILY"
     else if( freq == 2)
@@ -113,7 +124,7 @@ app.post('/submit-form', (req, res) => {
   }
   
   console.log("==================")
-  console.log(cal.toString())
+  // console.log(event_list[0])
   console.log("==================")
 
 
