@@ -65,8 +65,8 @@ app.post('/submit-form', (req, res) => {
       if(event.start && event.end){
         var stdate = new Date(event.start);
         var endate = new Date(event.end);
-        stdate.setHours(event.start.getHours())
-        endate.setHours(event.end.getHours())
+        stdate.setHours(event.start.getUTCHours())
+        endate.setHours(event.end.getUTCHours())
         event.start.setDate(stdate.getDate() + Math.abs(Difference_In_Days));
         event.end.setDate(endate.getDate() + Math.abs(Difference_In_Days));
       }
