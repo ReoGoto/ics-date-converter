@@ -21,7 +21,9 @@ app.post('/submit-form', (req, res) => {
   var filename = req.files.document.name
   //console.log( req.files.document.name); // the uploaded file object
   var start_date = new Date(req.body.startDate)
-  console.log( start_date )
+  console.log( "input " + start_date )
+  start_date.setHours(start_date.getHours(),start_date.getMinutes() + start_date.getTimezoneOffset() );
+  console.log( "input " + start_date )
 
   //const events = ical.sync.parseFile('JusticeJune.ics');
   const events = ical.sync.parseICS(req.files.document.data.toString() );
@@ -35,13 +37,12 @@ app.post('/submit-form', (req, res) => {
 
   for(i = 1; i<dates.length; i++){
     if(minimumDate.getTime() > dates[i].getTime()){
-      console.log( "min date" + dates[i])
+      //console.log( "min date" + dates[i])
       minimumDate = dates[i]
     }
   }
 
   //var minimumDate = new Date(Math.min.apply(null, dates)); 
-  console.log(minimumDate )
   //start_date.setUTCHours(minimumDate.getUTCHours())
   
   //start_date.setHours(minimumDate.getHours())
@@ -53,13 +54,10 @@ app.post('/submit-form', (req, res) => {
   var m = new Date(minimumDate)
   s.setHours(0,0,0)
   m.setHours(0,0,0)
-  // s.setUTCHours(0,0,0)
-  // m.setUTCHours(0,0,0)
   var Difference_In_Days = s.getDate() - m.getDate()
-  console.log("s " + s)
-  console.log("m " + m)
+  //console.log("s " + s)
+  //console.log("m " + m)
 
-  console.log( Difference_In_Days )
 
   for (const event of Object.values(events)) {
       if(event.start && event.end){
@@ -68,7 +66,7 @@ app.post('/submit-form', (req, res) => {
         event.start.setHours(stdate.getHours(),stdate.getMinutes() + event.start.getTimezoneOffset() );
         event.end.setHours(endate.getHours(),endate.getMinutes() + event.start.getTimezoneOffset() );
         event.start.setUTCDate(stdate.getUTCDate() + Math.abs(Difference_In_Days));
-        event.end.setUTCDate(endate.getUTCDate() + Math.abs(Difference_In_Days));
+        event.end.setUTCDate(endate.getUTCDate() + Math.abs(Difference_In_Days));        
       }
       if(event.rrule)
         console.log("rrule " + event.rrule)
@@ -94,7 +92,7 @@ app.post('/submit-form', (req, res) => {
 
   const cal  = ical_w(no_event)
   cal.events(event_list)
-  console.log(event_list[0])
+  console.log(event_list[0].start)
 
   for(i = 0; i < repeat_event_list.length; i++){
     //repeat_event_list[i].rrule.options.dtstart = repeat_event_list[i].start
