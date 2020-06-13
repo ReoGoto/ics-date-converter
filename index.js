@@ -72,6 +72,7 @@ app.post('/submit-form', (req, res) => {
       }
       if(event.rrule)
         console.log("rrule " + event.rrule)
+      console.log("values" + event.start)
   };
   
   var event_list = [];
