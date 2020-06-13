@@ -54,7 +54,7 @@ app.post('/submit-form', (req, res) => {
   }
 
   console.log(minimumDate)
-  minimumDate.setUTCHours( minimumDate.getUTCHours()-5, minimumDate.getUTCMinutes()  )
+  minimumDate.setUTCHours( minimumDate.getUTCHours(), minimumDate.getUTCMinutes()  )
   console.log( "minday " + minimumDate.toISOString())
 
 
