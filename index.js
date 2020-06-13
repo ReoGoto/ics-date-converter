@@ -63,26 +63,26 @@ app.post('/submit-form', (req, res) => {
 
   for (const event of Object.values(events)) {
       if(event.start && event.end){
-        var stdate = new Date(event.start.getFullYear(),
+        var stdate = new Date(Date.UTC(event.start.getFullYear(),
                               event.start.getMonth(),
                               event.start.getDate(),
                               event.start.getHours(),
                               event.start.getMinutes() + event.start.getTimezoneOffset()
-                              );
-        var endate = new Date(event.end.getFullYear(),
+        ));
+        var endate = new Date(Date.UTC(event.end.getFullYear(),
                               event.end.getMonth(),
                               event.end.getDate(),
                               event.end.getHours(),
                               event.end.getMinutes() + event.end.getTimezoneOffset()
-                              );                              
+                              ));                              
         event.start.setUTCDate(stdate.getUTCDate() + Math.abs(Difference_In_Days));
         event.end.setUTCDate(endate.getUTCDate() + Math.abs(Difference_In_Days));
       }
       if(event.rrule)
         console.log("rrule " + event.rrule)
 
-      var v = new Date(2020,2,2,2,2+start_date.getTimezoneOffset())
-      console.log("values " + v)
+      // var v = new Date(2020,2,2,2,2+start_date.getTimezoneOffset())
+      // console.log("values " + v)
       
   };
   
