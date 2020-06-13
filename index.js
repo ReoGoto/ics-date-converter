@@ -33,7 +33,7 @@ app.post('/submit-form', (req, res) => {
   };
   var minimumDate = dates[0]
   console.log("===================")
-  console.log(events)
+  //console.log(events)
   console.log("===================")
 
   for(i = 1; i<dates.length; i++){
@@ -45,7 +45,8 @@ app.post('/submit-form', (req, res) => {
 
   //var minimumDate = new Date(Math.min.apply(null, dates)); 
   console.log(minimumDate )
-  start_date.setUTCHours(minimumDate.getUTCHours())
+  //start_date.setUTCHours(minimumDate.getUTCHours())
+  
   //start_date.setHours(minimumDate.getHours())
   console.log(start_date.getDate() - minimumDate.getDate())
   
@@ -55,6 +56,8 @@ app.post('/submit-form', (req, res) => {
   var m = new Date(minimumDate)
   s.setHours(0,0,0)
   m.setHours(0,0,0)
+  s.setUTCHours(0,0,0)
+  m.setUTCHours(0,0,0)
   var Difference_In_Days = s.getDate() - m.getDate()
   console.log("s " + s)
   console.log("m " + m)
@@ -72,7 +75,7 @@ app.post('/submit-form', (req, res) => {
       }
       if(event.rrule)
         console.log("rrule " + event.rrule)
-      console.log("values" + event.start)
+      console.log("values " + event.start)
   };
   
   var event_list = [];
