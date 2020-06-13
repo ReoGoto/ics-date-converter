@@ -32,9 +32,6 @@ app.post('/submit-form', (req, res) => {
         dates.push(new Date(event.start )); 
   };
   var minimumDate = dates[0]
-  console.log("===================")
-  //console.log(events)
-  console.log("===================")
 
   for(i = 1; i<dates.length; i++){
     if(minimumDate.getTime() > dates[i].getTime()){
@@ -56,8 +53,8 @@ app.post('/submit-form', (req, res) => {
   var m = new Date(minimumDate)
   s.setHours(0,0,0)
   m.setHours(0,0,0)
-  s.setUTCHours(0,0,0)
-  m.setUTCHours(0,0,0)
+  // s.setUTCHours(0,0,0)
+  // m.setUTCHours(0,0,0)
   var Difference_In_Days = s.getDate() - m.getDate()
   console.log("s " + s)
   console.log("m " + m)
@@ -66,16 +63,27 @@ app.post('/submit-form', (req, res) => {
 
   for (const event of Object.values(events)) {
       if(event.start && event.end){
-        var stdate = new Date(event.start);
-        var endate = new Date(event.end);
-        stdate.setHours(event.start.getUTCHours())
-        endate.setHours(event.end.getUTCHours())
-        event.start.setDate(stdate.getDate() + Math.abs(Difference_In_Days));
-        event.end.setDate(endate.getDate() + Math.abs(Difference_In_Days));
+        var stdate = new Date(event.start.getFullYear(),
+                              event.start.getMonth(),
+                              event.start.getDate(),
+                              event.start.getHours(),
+                              event.start.getMinutes() + event.start.getTimezoneOffset()
+                              );
+        var endate = new Date(event.end.getFullYear(),
+                              event.end.getMonth(),
+                              event.end.getDate(),
+                              event.end.getHours(),
+                              event.end.getMinutes() + event.end.getTimezoneOffset()
+                              );                              
+        event.start.setUTCDate(stdate.getUTCDate() + Math.abs(Difference_In_Days));
+        event.end.setUTCDate(endate.getUTCDate() + Math.abs(Difference_In_Days));
       }
       if(event.rrule)
         console.log("rrule " + event.rrule)
-      console.log("values " + event.start)
+
+      var v = new Date(2020,2,2,2,2+start_date.getTimezoneOffset())
+      console.log("values " + v)
+      
   };
   
   var event_list = [];
