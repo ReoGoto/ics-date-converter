@@ -75,10 +75,10 @@ app.post('/submit-form', (req, res) => {
 
         var stdate = new Date(event.start);
         var endate = new Date(event.end);
-        event.start.setUTCHours(stdate.getUTCHours()-5, stdate.getUTCMinutes()  );
-        event.end.setUTCHours(endate.getUTCHours()-5, endate.getUTCMinutes()  );
-        event.start.setDate(stdate.getDate() + Math.abs(Difference_In_Days));
-        event.end.setDate(endate.getDate() + Math.abs(Difference_In_Days));        
+        event.start.setUTCHours(stdate.getUTCHours(), stdate.getUTCMinutes()  );
+        event.end.setUTCHours(endate.getUTCHours(), endate.getUTCMinutes()  );
+        event.start.setUTCDate(stdate.getUTCDate() + Math.abs(Difference_In_Days));
+        event.end.setUTCDate(endate.getUTCDate() + Math.abs(Difference_In_Days));        
 
         //console.log("new " + event.start.toISOString())
         //console.log("==========================")
