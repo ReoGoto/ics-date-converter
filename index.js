@@ -75,8 +75,8 @@ app.post('/submit-form', (req, res) => {
 
         var stdate = new Date(event.start);
         var endate = new Date(event.end);
-        event.start.setUTCHours(stdate.getUTCHours(), stdate.getUTCMinutes()  );
-        event.end.setUTCHours(endate.getUTCHours(), endate.getUTCMinutes()  );
+        event.start.setUTCHours(stdate.getUTCHours(), stdate.getUTCMinutes() + diff );
+        event.end.setUTCHours(endate.getUTCHours(), endate.getUTCMinutes() + diff );
         event.start.setUTCDate(stdate.getUTCDate() + Math.abs(Difference_In_Days));
         event.end.setUTCDate(endate.getUTCDate() + Math.abs(Difference_In_Days));        
 
