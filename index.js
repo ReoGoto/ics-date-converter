@@ -63,8 +63,8 @@ app.post('/submit-form', (req, res) => {
       if(event.start && event.end){
         var stdate = new Date(event.start);
         var endate = new Date(event.end);
-        event.start.setHours(stdate.getHours(),stdate.getMinutes() + event.start.getTimezoneOffset() );
-        event.end.setHours(endate.getHours(),endate.getMinutes() + event.start.getTimezoneOffset() );
+        //event.start.setHours(stdate.getHours(),stdate.getMinutes() + event.start.getTimezoneOffset() );
+        //event.end.setHours(endate.getHours(),endate.getMinutes() + event.start.getTimezoneOffset() );
         event.start.setUTCDate(stdate.getUTCDate() + Math.abs(Difference_In_Days));
         event.end.setUTCDate(endate.getUTCDate() + Math.abs(Difference_In_Days));        
       }
@@ -112,6 +112,11 @@ app.post('/submit-form', (req, res) => {
       cal.createEvent(repeat_event_list[i]).repeating({freq: freq })// required
   }
   
+  console.log("==================")
+  console.log(cal.toString())
+  console.log("==================")
+
+
   writeFileSync(`${__dirname}/event.ics`, cal.toString(), (err) => {
     if (err) return console.log(err);
     console.log('ics is saved');
