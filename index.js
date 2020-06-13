@@ -80,8 +80,8 @@ app.post('/submit-form', (req, res) => {
         event.start.setUTCDate(stdate.getUTCDate() + Math.abs(Difference_In_Days));
         event.end.setUTCDate(endate.getUTCDate() + Math.abs(Difference_In_Days));        
 
-        //console.log("new " + event.start.toISOString())
-        //console.log("==========================")
+        console.log("new " + event.start)
+        console.log("==========================")
       }
       if(event.rrule)
         console.log("rrule " + event.rrule)
@@ -105,7 +105,7 @@ app.post('/submit-form', (req, res) => {
 
   const cal  = ical_w(no_event)
   cal.events(event_list)
-  console.log(event_list[0].start)
+  console.log("eve0 " + event_list[0].start)
 
   for(i = 0; i < repeat_event_list.length; i++){
     //repeat_event_list[i].rrule.options.dtstart = repeat_event_list[i].start
