@@ -29,7 +29,6 @@ app.post('/submit-form', (req, res) => {
 
   //const events = ical.sync.parseFile('JusticeJune.ics');
   const events = ical.sync.parseICS(req.files.document.data.toString() );
-  console.log( events )
 
 
   var dates = []; 
@@ -47,11 +46,23 @@ app.post('/submit-form', (req, res) => {
     }
   }
 
+  console.log()
+
   minimumDate = moment(minimumDate)
   minimumDate.utcOffset( minimumDate.utcOffset() )
   console.log( "mini day " + minimumDate.format() )
-  var Difference_In_Days = start_date.diff(minimumDate, "days")
+ 
+  var a = moment(`${start_date.year()}-${start_date.month()+1}-${start_date.date()}`)
+  console.log("a " + a.format() )
+ 
+  var m = minimumDate.hour(0).minute(0)
+  var s = start_date.hour(0).minute(0)
+ 
+  //var Difference_In_Days = s.getDate() - m.getDate()
+  var Difference_In_Days = s.diff(m, "days", true)
   console.log( "diff days " + Difference_In_Days)
+
+
 
   for (const event of Object.values(events)) {
       if(event.start && event.end){
@@ -81,15 +92,20 @@ app.post('/submit-form', (req, res) => {
   var event_list = [];
   var repeat_event_list = []
   var no_event = []
-  for (const event of Object.values(events)) {
-    event["allDay"] = true
+  for (const event of Object.values(events)) { 
+
     if(event.type === 'VEVENT')
-      if (event.rrule)
+      if (event.rrule){
         repeat_event_list.push(event)
-      else
+      }else{
+        if( event.start.search("dateOnly: true") > -1) 
+          event["allDay"] = true
+        // if( event.start.search("{ tz:") > -1)
+        //   event 
         event_list.push(event)   
-    else
+    }else{
       no_event.push(event)
+    }
   }
 
 
@@ -112,9 +128,8 @@ app.post('/submit-form', (req, res) => {
       cal.createEvent(repeat_event_list[i]).repeating({freq: freq })// required
   }
   
-  console.log("==================")
-  //event_list[2].start = `${event_list[2].start } { tz: undefined, dateOnly: true}`
-  console.log(event_list[2]  )
+  //console.log("==================")
+//  console.log(event_list[2]  )
 
 
   writeFileSync(`${__dirname}/event.ics`, cal.toString(), (err) => {
