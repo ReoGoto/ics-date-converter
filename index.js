@@ -46,14 +46,9 @@ app.post('/submit-form', (req, res) => {
     }
   }
 
-  console.log()
-
   minimumDate = moment(minimumDate)
   minimumDate.utcOffset( minimumDate.utcOffset() )
   console.log( "mini day " + minimumDate.format() )
- 
-  var a = moment(`${start_date.year()}-${start_date.month()+1}-${start_date.date()}`)
-  console.log("a " + a.format() )
  
   var m = minimumDate.hour(0).minute(0)
   var s = start_date.hour(0).minute(0)
@@ -66,8 +61,15 @@ app.post('/submit-form', (req, res) => {
 
   for (const event of Object.values(events)) {
       if(event.start && event.end){
-        //console.log("old" + event.start)
+        
+        if (event.start.dateOnly )
+          event["allDay"] = true
 
+        // if( event.type === 'VEVENT')
+        //   console.log( typeof(event.start ))
+        //if( event.start.search("dateOnly: true") > -1)
+            //event.allDay = true
+        
         event.start = moment(event.start)
         event.start.utcOffset( event.start.utcOffset() )
         event.end = moment(event.end)
@@ -94,15 +96,16 @@ app.post('/submit-form', (req, res) => {
   var no_event = []
   for (const event of Object.values(events)) { 
 
-    if(event.type === 'VEVENT')
+    if(event.type === 'VEVENT'){
       if (event.rrule){
         repeat_event_list.push(event)
       }else{
-        if( event.start.search("dateOnly: true") > -1) 
-          event["allDay"] = true
-        // if( event.start.search("{ tz:") > -1)
-        //   event 
-        event_list.push(event)   
+        //  console.log(event.allDay) 
+       
+          // if( event.start.search("{ tz:") > -1)
+        //   event
+        event_list.push(event) 
+      }  
     }else{
       no_event.push(event)
     }
@@ -128,8 +131,8 @@ app.post('/submit-form', (req, res) => {
       cal.createEvent(repeat_event_list[i]).repeating({freq: freq })// required
   }
   
-  //console.log("==================")
-//  console.log(event_list[2]  )
+  console.log("==================")
+  console.log( event_list[2]  )
 
 
   writeFileSync(`${__dirname}/event.ics`, cal.toString(), (err) => {
