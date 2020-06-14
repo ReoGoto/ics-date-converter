@@ -21,17 +21,16 @@ app.post('/submit-form', (req, res) => {
 
   var filename = req.files.document.name
   //console.log( req.files.document.name); // the uploaded file object
-  //var start_date = new Date(req.body.startDate)
   var start_date = moment(req.body.startDate)
   start_date.utcOffset( start_date.utcOffset() )
-  //console.log( "input " + start_date.toISOString() )
   start_date.format()
 
-  var diff = 0
   console.log("now " +   start_date.format()    )
 
   //const events = ical.sync.parseFile('JusticeJune.ics');
   const events = ical.sync.parseICS(req.files.document.data.toString() );
+  console.log( events )
+
 
   var dates = []; 
   for (const event of Object.values(events)) {
@@ -64,15 +63,17 @@ app.post('/submit-form', (req, res) => {
         event.end.utcOffset( event.end.utcOffset() )
         
         if(Difference_In_Days >= 0){
-          event.start = event.start.add(Difference_In_Days, "days").format() 
+          event.start = event.start.add(Difference_In_Days, "days").format()
+          event.start.dateOnly = true
           event.end = event.end.add(Difference_In_Days, "days").format() 
         }else{
           event.start = event.start.subtract(Difference_In_Days, "days").format() 
+          event.start.dateOnly = true
           event.end = event.end.subtract(Difference_In_Days, "days").format() 
         }
 
-        console.log("new " + event.start)
-        console.log("==========================")
+        // console.log("new " + event.start )
+        // console.log("==========================")
       }
  
   };
@@ -81,6 +82,7 @@ app.post('/submit-form', (req, res) => {
   var repeat_event_list = []
   var no_event = []
   for (const event of Object.values(events)) {
+    event["allDay"] = true
     if(event.type === 'VEVENT')
       if (event.rrule)
         repeat_event_list.push(event)
@@ -93,8 +95,7 @@ app.post('/submit-form', (req, res) => {
 
   const cal  = ical_w(no_event)
   cal.events(event_list)
-  console.log("eve0 " + event_list[0].start)
-
+ 
   for(i = 0; i < repeat_event_list.length; i++){
     //repeat_event_list[i].rrule.options.dtstart = repeat_event_list[i].start
     var freq = repeat_event_list[i].rrule.options.freq
@@ -112,8 +113,8 @@ app.post('/submit-form', (req, res) => {
   }
   
   console.log("==================")
-  // console.log(event_list[0])
-  console.log("==================")
+  //event_list[2].start = `${event_list[2].start } { tz: undefined, dateOnly: true}`
+  console.log(event_list[2]  )
 
 
   writeFileSync(`${__dirname}/event.ics`, cal.toString(), (err) => {
