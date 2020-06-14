@@ -55,20 +55,13 @@ app.post('/submit-form', (req, res) => {
  
   //var Difference_In_Days = s.getDate() - m.getDate()
   var Difference_In_Days = s.diff(m, "days", true)
-  console.log( "diff days " + Difference_In_Days)
-
-
+  console.log( "diff days " + Difference_In_Days)  
 
   for (const event of Object.values(events)) {
       if(event.start && event.end){
         
         if (event.start.dateOnly )
           event["allDay"] = true
-
-        // if( event.type === 'VEVENT')
-        //   console.log( typeof(event.start ))
-        //if( event.start.search("dateOnly: true") > -1)
-            //event.allDay = true
         
         event.start = moment(event.start)
         event.start.utcOffset( event.start.utcOffset() )
@@ -100,10 +93,6 @@ app.post('/submit-form', (req, res) => {
       if (event.rrule){
         repeat_event_list.push(event)
       }else{
-        //  console.log(event.allDay) 
-       
-          // if( event.start.search("{ tz:") > -1)
-        //   event
         event_list.push(event) 
       }  
     }else{
@@ -112,9 +101,13 @@ app.post('/submit-form', (req, res) => {
   }
 
 
-  const cal  = ical_w(no_event)
+  const cal  = ical_w()
+
+  cal.timezone(no_event[0])
   cal.events(event_list)
+  console.log(no_event);
  
+
   for(i = 0; i < repeat_event_list.length; i++){
     //repeat_event_list[i].rrule.options.dtstart = repeat_event_list[i].start
     var freq = repeat_event_list[i].rrule.options.freq
@@ -132,7 +125,7 @@ app.post('/submit-form', (req, res) => {
   }
   
   console.log("==================")
-  console.log( event_list[2]  )
+  // console.log( event_list[2]  )
 
 
   writeFileSync(`${__dirname}/event.ics`, cal.toString(), (err) => {
