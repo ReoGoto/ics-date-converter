@@ -5,7 +5,7 @@ const fileUpload = require('express-fileupload')
 const ical = require('node-ical');
 //const ics = require('ics')
 const ical_w = require('ical-generator');
-var moment = require('moment-timezone');
+var moment = require('moment');
 const { start } = require('repl');
 
 const app = express()
@@ -21,18 +21,14 @@ app.post('/submit-form', (req, res) => {
 
   var filename = req.files.document.name
   //console.log( req.files.document.name); // the uploaded file object
-  var start_date = new Date(req.body.startDate)
-  console.log( "input " + start_date.toISOString() )
+  //var start_date = new Date(req.body.startDate)
+  var start_date = moment(req.body.startDate)
+  start_date.utcOffset( start_date.utcOffset() )
+  //console.log( "input " + start_date.toISOString() )
+  start_date.format()
 
-  var diff = start_date.getTimezoneOffset()
-  console.log("diff " + diff )
-
-  //moment().tz("America/Los_Angeles").format();
-  start_date.setHours(start_date.getHours(),start_date.getMinutes() + 0*start_date.getTimezoneOffset() );
-
-  //  start_date.toISOString()  //=> "2020-04-12T16:00:00.000Z"
-  console.log("now " +   start_date.toISOString()    )
-  //console.log("now   " + start_date )
+  var diff = 0
+  console.log("now " +   start_date.format()    )
 
   //const events = ical.sync.parseFile('JusticeJune.ics');
   const events = ical.sync.parseICS(req.files.document.data.toString() );
@@ -42,9 +38,8 @@ app.post('/submit-form', (req, res) => {
       if(event.start)
         dates.push(new Date(event.start )); 
   };
+
   var minimumDate = dates[0]
-  console.log( typeof(minimumDate))
-//  minimumDate.setHours(minimumDate.getHours(),minimumDate.getMinutes() - diff )
 
   for(i = 1; i<dates.length; i++){
     if(minimumDate.getTime() > dates[i].getTime()){
@@ -53,44 +48,33 @@ app.post('/submit-form', (req, res) => {
     }
   }
 
-  console.log(minimumDate)
-  minimumDate.setUTCHours( minimumDate.getUTCHours(), minimumDate.getUTCMinutes()  )
-  //minimumDate = minimumDate.toISOString()
-  console.log( "minday " + minimumDate)
-
-
-  console.log(start_date.getDate() - minimumDate.getDate())
-  console.log("stday " + start_date.getDate() + " minday " + minimumDate.getDate())
-  // var Difference_In_Time = start_date.getTime() - minimumDate.getTime(); 
-  // var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24); 
-  var s = new Date(start_date)
-  var m = new Date(minimumDate)
-  s.setUTCHours(0,0,0)
-  m.setUTCHours(0,0,0)
-  var Difference_In_Days = s.getDate() - m.getDate()
-  
+  minimumDate = moment(minimumDate)
+  minimumDate.utcOffset( minimumDate.utcOffset() )
+  console.log( "mini day " + minimumDate.format() )
+  var Difference_In_Days = start_date.diff(minimumDate, "days")
+  console.log( "diff days " + Difference_In_Days)
 
   for (const event of Object.values(events)) {
       if(event.start && event.end){
         //console.log("old" + event.start)
 
-        var stdate = new Date(event.start);
-        var endate = new Date(event.end);
-        event.start.setUTCHours(stdate.getUTCHours(), stdate.getUTCMinutes()  );
-        event.end.setUTCHours(endate.getUTCHours(), endate.getUTCMinutes()  );
-        event.start.setUTCDate(stdate.getUTCDate() + Math.abs(Difference_In_Days));
-        event.end.setUTCDate(endate.getUTCDate() + Math.abs(Difference_In_Days));        
-
-        event.start = event.start.toISOString()
-        event.end = event.end.toISOString()
+        event.start = moment(event.start)
+        event.start.utcOffset( event.start.utcOffset() )
+        event.end = moment(event.end)
+        event.end.utcOffset( event.end.utcOffset() )
+        
+        if(Difference_In_Days >= 0){
+          event.start = event.start.add(Difference_In_Days, "days").format() 
+          event.end = event.end.add(Difference_In_Days, "days").format() 
+        }else{
+          event.start = event.start.subtract(Difference_In_Days, "days").format() 
+          event.end = event.end.subtract(Difference_In_Days, "days").format() 
+        }
 
         console.log("new " + event.start)
         console.log("==========================")
       }
-      if(event.rrule)
-        console.log("rrule " + event.rrule)
-      
-     // console.log(event.start.toISOString() )
+ 
   };
   
   var event_list = [];
